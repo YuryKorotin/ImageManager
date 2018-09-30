@@ -42,9 +42,9 @@ func parseTranslationResponse(res *http.Response) string{
 
 	if (err == nil) {
 		translation = translationResponse.Texts[0]
-		}
+	}
 
-		return translation
+	return translation
 }
 
 func images(w http.ResponseWriter, r *http.Request) {
