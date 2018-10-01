@@ -1,8 +1,9 @@
 package main
 
 import (
-	"testing"
-	//"fmt"
+  "testing"
+  "io/ioutil"
+  "path/filepath"
 )
 
 func TestGetTranslations(t *testing.T) {
@@ -14,13 +15,16 @@ func TestGetTranslations(t *testing.T) {
 }
 
 func TestFormatUnsplashSearhResult(t *testing.T) {
-  var searchJsonResult = "{}"
-  var imagesCollectionExpectedSize = 5
+  fixturePath, _ := filepath.Abs("fixtures/unsplash_response.json")
+  fixtureBytes, _ := ioutil.ReadFile(fixturePath)
+
+  var searchJsonResult = string(fixtureBytes)
+  imagesCollectionExpectedSize := 5
 
   unsplashSearchResult := formatUnsplashSearchResult(searchJsonResult)
   realResultsLen := len(unsplashSearchResult.Results)
 
   if(realResultsLen < imagesCollectionExpectedSize) {
-    t.Error("Images collection  size is incorrect, got %i, want %i.", realResultsLen, imagesCollectionExpectedSize)
+    t.Errorf("Images collection size is incorrect, got: %d, want: %d.", realResultsLen, imagesCollectionExpectedSize)
   }
 }
