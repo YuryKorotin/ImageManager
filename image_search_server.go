@@ -6,20 +6,33 @@ import (
 	"fmt"
 	"io/ioutil"
 	"encoding/json"
-  	//"github.com/peterhellberg/giphy"
-  	"github.com/tkanos/gonfig"
+	//"github.com/peterhellberg/giphy"
+	"github.com/tkanos/gonfig"
 	"path/filepath"
 )
 
 type ApiKeysConfiguration struct {
-    YandexTranslationApiKey string
-    UnsplashApiKey string
+  YandexTranslationApiKey string
+  UnsplashApiKey string
 }
 
 type TranslationResponse struct {
-	Code int `json:"code"`
-	Lang string `json:"lang"`
-	Texts []string `json:"text"`
+  Code int `json:"code"`
+  Lang string `json:"lang"`
+  Texts []string `json:"text"`
+}
+
+type UnsplashLink struct {
+  Download string `json:"download"`
+}
+
+type UnsplashResult struct {
+  Links []UnsplashLink `json:"links"`
+}
+
+type UnsplashResponse struct {
+  Total int `json:"total"`
+  Results []UnsplashResult `json:"results"`
 }
 
 func getTranslations(body []byte) (*TranslationResponse, error) {
@@ -106,6 +119,16 @@ func requestImageFromQwant(query string) string {
 	fmt.Println(rootUrl)
 	fmt.Println(resp.StatusCode)
 	return bodyString
+}
+
+func formatUnsplashSearchResult(searchResponseString string) UnsplashResponse{
+  byteValue := []byte(searchResponseString)
+
+  var response UnsplashResponse
+
+  json.Unmarshal(byteValue, &response)
+
+  return response
 }
 
 func requestImageFromUnsplash(query string) string {

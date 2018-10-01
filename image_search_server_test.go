@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	//"fmt"
+)
 
 func TestGetTranslations(t *testing.T) {
   var body = "{\"code\":102, \"lang\": \"ru-en\", \"text\": [\"translation\"] }"
@@ -15,8 +18,9 @@ func TestFormatUnsplashSearhResult(t *testing.T) {
   var imagesCollectionExpectedSize = 5
 
   unsplashSearchResult := formatUnsplashSearchResult(searchJsonResult)
+  realResultsLen := len(unsplashSearchResult.Results)
 
-  if(len(unsplashSearchResult) < imagesCollectionExpectedSize) {
-    t.Error("Images collection is incorrect, got %s, want %s.", len(unsplashSearchResult), imagesCollectionExpectedSize)
+  if(realResultsLen < imagesCollectionExpectedSize) {
+    t.Error("Images collection  size is incorrect, got %i, want %i.", realResultsLen, imagesCollectionExpectedSize)
   }
 }
