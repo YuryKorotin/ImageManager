@@ -25,7 +25,21 @@ func TestFormatUnsplashSearhResult(t *testing.T) {
   unsplashSearchResult := server.FormatUnsplashSearchResult(searchJsonResult)
   realResultsLen := len(unsplashSearchResult.Results)
 
-  if(realResultsLen < imagesCollectionExpectedSize) {
+  if (realResultsLen < imagesCollectionExpectedSize) {
     t.Errorf("Images collection size is incorrect, got: %d, want: %d.", realResultsLen, imagesCollectionExpectedSize)
+  }
+}
+
+func TestFormatGiphySearchResult(t *testing.T) {
+  fixturePath, _ := filepath.Abs("../fixtures/giphy_response.json")
+  fixtureBytes, _ := ioutil.ReadFile(fixturePath)
+
+  var searchJsonResult = string(fixtureBytes)
+  imagesCollectionExpectedSize := 10
+
+  giphySearchResult := server.FormatGiphySearchResult(searchJsonResult)
+  realResultsLen := len(giphySearchResult.Data)
+  if (realResultsLen != imagesCollectionExpectedSize) {
+    t.Errorf("Giphy images collection size is incorrect, got: %d, want: %d.", realResultsLen, imagesCollectionExpectedSize)
   }
 }

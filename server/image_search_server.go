@@ -113,6 +113,15 @@ func FormatUnsplashSearchResult(searchResponseString string) UnsplashResponse{
 
   return response
 }
+func FormatGiphySearchResult(searchResponseString string) GiphyResponse {
+  byteValue := []byte(searchResponseString)
+
+  var response GiphyResponse
+
+  json.Unmarshal(byteValue, &response)
+
+  return response
+}
 
 func requestImageFromUnsplash(query string) string {
 	configuration := ApiKeysConfiguration{}
