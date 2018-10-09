@@ -10,9 +10,14 @@ import (
 	"path/filepath"
 )
 
+type GatheredCollectionResult struct {
+  GiphyImages []string
+  UnsplashImages []string
+  PexelImages []string
+}
+
 type ImageCollectionResult struct {
-  GiphyImageUrl []string
-  UnsplashImageUrl []string
+  ImageUrls []string
 }
 
 func RequestImageFromQwant(query string) string {
@@ -45,30 +50,39 @@ func RequestImageFromQwant(query string) string {
 }
 
 func RequestImageFromUnsplash(query string) string {
-	configuration := ApiKeysConfiguration{}
-	configPath, _ := filepath.Abs("image_manager/api_keys.json")
-	err := gonfig.GetConf(configPath, &configuration)
-	fmt.Println(err)
+  configuration := ApiKeysConfiguration{}
+  configPath, _ := filepath.Abs("image_manager/api_keys.json")
+  err := gonfig.GetConf(configPath, &configuration)
+  fmt.Println(err)
 
-	clientId := configuration.UnsplashApiKey
-	fmt.Println(clientId)
-	rootUrl := fmt.Sprintf("https://api.unsplash.com/search/photos?client_id=%s&query=%s", clientId, query)
+  clientId := configuration.UnsplashApiKey
+  fmt.Println(clientId)
+  rootUrl := fmt.Sprintf("https://api.unsplash.com/search/photos?client_id=%s&query=%s", clientId, query)
 
-	resp, _ := http.Get(rootUrl)
-	var bodyString = "NO RESULTS"
+  resp, _ := http.Get(rootUrl)
+  var bodyString = "NO RESULTS"
 
-	if resp.StatusCode == http.StatusOK {
-		bodyBytes, erro := ioutil.ReadAll(resp.Body)
-		bodyString = string(bodyBytes)
-		fmt.Println(erro)
-	}
-	fmt.Println(rootUrl)
-	fmt.Println(resp.StatusCode)
-	return bodyString
+  if resp.StatusCode == http.StatusOK {
+    bodyBytes, erro := ioutil.ReadAll(resp.Body)
+    bodyString = string(bodyBytes)
+    fmt.Println(erro)
+  }
+  fmt.Println(rootUrl)
+  fmt.Println(resp.StatusCode)
+  return bodyString
 }
 
 func ParallelGet(concurrencyLimit int) ImageCollectionResult {
-	var result ImageCollectionResult
+  var result ImageCollectionResult
 
-	return result
+  semaphoreChan := make(chan struct{}, concurrencyLimit)
+  resultsChan :=  make(chan *result)
+
+  defer func() {
+     close(semaphoreChan)
+     close(resultsChan)
+  }()
+
+
+  return result
 }
