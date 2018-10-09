@@ -14,6 +14,7 @@ type GatheredCollectionResult struct {
   GiphyImages []string
   UnsplashImages []string
   PexelImages []string
+  QwantImages []string
 }
 
 type ImageCollectionResult struct {
@@ -72,7 +73,17 @@ func RequestImageFromUnsplash(query string) string {
   return bodyString
 }
 
-func ParallelGet(concurrencyLimit int) ImageCollectionResult {
+func requestsSequency(query string) {
+  actions := map[string]func(query string){
+    "unsplash": func(query string) { 
+       responseString := RequestImageFromUnsplash(query)
+       FormatUnsplashSearchResult(responseString)
+     },
+    "qwant": func(query string) { RequestImageFromQwant(query) },
+  }
+}
+
+func ParallelGet(query string, concurrencyLimit int) ImageCollectionResult {
   var result ImageCollectionResult
 
   semaphoreChan := make(chan struct{}, concurrencyLimit)
@@ -83,6 +94,32 @@ func ParallelGet(concurrencyLimit int) ImageCollectionResult {
      close(resultsChan)
   }()
 
+  requests := requestsSequency(query)
+
+  for key, value := range m {
+    value(query)
+    go func(i int, url string) {
+      semaphoreChan <- struct{}{}
+      res := value(query)
+      result := &ImageCollectionResult()
+
+      resultsChan <- result
+      <-semaphoreChan
+    }(key, value)
+  }
+
+  var finalResult GatheredCollectionResult
+
+  requestIndex := 0
+
+  for {
+    result := <-resultsChan
+
+    if (len(requests) == requestIndex) {
+	break
+    }
+    requestIndex += 1
+  }
 
   return result
 }
